@@ -3,7 +3,7 @@
  * Module exports.
  */
 
-module.exports = exports = ProxyAgent;
+module.exports = exports = { ProxyAgent };
 
 /**
  * Module dependencies.
@@ -23,7 +23,7 @@ var debug = require('debug')('vscode-proxy-agent');
 /**
  * The `ProxyAgent` class.
  *
- * session : {
+ * options : {
  *   resolveProxy(url, callback)
  * }
  * 

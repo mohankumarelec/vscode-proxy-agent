@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "NodeJS http(s) agent implementation for VS Code",
   "main": "index.js",
+  "types": "index.d.ts",
   "repository": {
     "type": "git",
     "url": "git://github.com/Microsoft/vscode-proxy-agent.git"
