@@ -3,18 +3,7 @@
  * Module exports.
  */
 
-module.exports = exports = ElectronProxyAgent;
-
-/**
- * Supported "protocols". Delegates out to the `get-uri` module.
- */
-
-var getUri = require('get-uri');
-Object.defineProperty(exports, 'protocols', {
-  enumerable: true,
-  configurable: true,
-  get: function () { return Object.keys(getUri.protocols); }
-});
+module.exports = exports = ProxyAgent;
 
 /**
  * Module dependencies.
@@ -24,16 +13,15 @@ var net = require('net');
 var tls = require('tls');
 var parse = require('url').parse;
 var format = require('url').format;
-var extend = require('extend');
 var Agent = require('agent-base');
 var HttpProxyAgent = require('http-proxy-agent');
 var HttpsProxyAgent = require('https-proxy-agent');
 var SocksProxyAgent = require('socks-proxy-agent');
 var inherits = require('util').inherits;
-var debug = require('debug')('electron-proxy-agent');
+var debug = require('debug')('vscode-proxy-agent');
 
 /**
- * The `ElectronProxyAgent` class.
+ * The `ProxyAgent` class.
  *
  * session : {
  *   resolveProxy(url, callback)
@@ -44,17 +32,8 @@ var debug = require('debug')('electron-proxy-agent');
  * @api public
  */
 
-function ElectronProxyAgent(session) {
-  if (!(this instanceof ElectronProxyAgent)) return new ElectronProxyAgent(session);
-
-  if (!session || typeof(session.resolveProxy) !== 'function') {
-    debug('no valid session found, trying to initialize ElectronProxyAgent with defaultSession');
-    if (typeof(window) === 'undefined') {
-      session = require('session').defaultSession;
-    } else {
-      session = require('remote').getCurrentWindow().webContents.session;
-    }
-  }
+function ProxyAgent(session) {
+  if (!(this instanceof ProxyAgent)) return new ProxyAgent(session);
 
   Agent.call(this, connect);
 
@@ -62,7 +41,7 @@ function ElectronProxyAgent(session) {
 
   this.cache = this._resolver = null;
 }
-inherits(ElectronProxyAgent, Agent);
+inherits(ProxyAgent, Agent);
 
 /**
  * Called when the node-core HTTP client library is creating a new HTTP request.
@@ -72,7 +51,6 @@ inherits(ElectronProxyAgent, Agent);
 
 function connect (req, opts, fn) {
   var url;
-  var host;
   var self = this;
   var secure = Boolean(opts.secureEndpoint);
 
@@ -85,7 +63,7 @@ function connect (req, opts, fn) {
     search = path.substring(firstQuestion);
     path = path.substring(0, firstQuestion);
   }
-  url = format(extend({}, opts, {
+  url = format(Object.assign({}, opts, {
     protocol: secure ? 'https:' : 'http:',
     pathname: path,
     search: search,

@@ -1,15 +1,13 @@
 {
-  "name": "electron-proxy-agent",
-  "version": "1.0.2",
-  "description": "NodeJS http(s).Agent implementation for electron shell",
+  "name": "vscode-proxy-agent",
+  "version": "0.1.0",
+  "description": "NodeJS http(s) agent implementation for VS Code",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/felicienfrancois/electron-proxy-agent.git"
+    "url": "git://github.com/Microsoft/vscode-proxy-agent.git"
   },
   "keywords": [
-    "electron",
-    "atom shell",
     "proxy",
     "agent",
     "http",
@@ -20,20 +18,19 @@
   ],
   "authors": [
     "Nathan Rajlich <nathan@tootallnate.net> (http://n8.io/)",
-    "Félicien François <felicien@tweakstyle.com>"
+    "Félicien François <felicien@tweakstyle.com>",
+    "Microsoft Corporation"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/felicienfrancois/node-electron-proxy-agent/issues"
+    "url": "https://github.com/Microsoft/vscode-proxy-agent/issues"
   },
-  "homepage": "https://github.com/felicienfrancois/node-electron-proxy-agent",
+  "homepage": "https://github.com/Microsoft/vscode-proxy-agent",
   "dependencies": {
-    "agent-base": "2",
-    "debug": "2",
-    "extend": "3",
-    "get-uri": "1",
-    "http-proxy-agent": "1",
-    "https-proxy-agent": "1",
-    "socks-proxy-agent": "2"
+    "agent-base": "4.2.1",
+    "debug": "3.1.0",
+    "http-proxy-agent": "2.1.0",
+    "https-proxy-agent": "2.2.1",
+    "socks-proxy-agent": "4.0.1"
   }
 }
