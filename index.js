@@ -118,7 +118,14 @@ function connect (req, opts, fn) {
         agent = new HttpProxyAgent(proxy);
       }
     } else {
-      throw new Error('Unknown proxy type: ' + type);
+      // direct connection to the destination endpoint
+      var socket;
+      if (secure) {
+        socket = tls.connect(opts);
+      } else {
+        socket = net.connect(opts);
+      }
+      return fn(null, socket);
     }
     if (agent) agent.callback(req, opts, fn);
   }
