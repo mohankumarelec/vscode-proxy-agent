@@ -9,15 +9,12 @@ module.exports = exports = { ProxyAgent };
  * Module dependencies.
  */
 
-var net = require('net');
-var tls = require('tls');
+var http = require('http');
 var parse = require('url').parse;
 var format = require('url').format;
-var Agent = require('agent-base');
 var HttpProxyAgent = require('http-proxy-agent');
 var HttpsProxyAgent = require('https-proxy-agent');
 var SocksProxyAgent = require('socks-proxy-agent');
-var inherits = require('util').inherits;
 var debug = require('debug')('vscode-proxy-agent');
 
 /**
@@ -35,13 +32,9 @@ var debug = require('debug')('vscode-proxy-agent');
 function ProxyAgent(session) {
   if (!(this instanceof ProxyAgent)) return new ProxyAgent(session);
 
-  Agent.call(this, connect);
-
   this.session = session;
-
-  this.cache = this._resolver = null;
+  this.addRequest = addRequest;
 }
-inherits(ProxyAgent, Agent);
 
 /**
  * Called when the node-core HTTP client library is creating a new HTTP request.
@@ -49,13 +42,12 @@ inherits(ProxyAgent, Agent);
  * @api public
  */
 
-function connect (req, opts, fn) {
+function addRequest (req, opts) {
   var url;
   var self = this;
-  var secure = Boolean(opts.secureEndpoint);
 
   // calculate the `url` parameter
-  var defaultPort = secure ? 443 : 80;
+  var defaultAgent = opts._defaultAgent || http.globalAgent;
   var path = req.path;
   var firstQuestion = path.indexOf('?');
   var search;
@@ -64,7 +56,7 @@ function connect (req, opts, fn) {
     path = path.substring(0, firstQuestion);
   }
   url = format(Object.assign({}, opts, {
-    protocol: secure ? 'https:' : 'http:',
+    protocol: defaultAgent.protocol,
     pathname: path,
     search: search,
 
@@ -73,7 +65,7 @@ function connect (req, opts, fn) {
     host: null,
 
     // set `port` to null when it is the protocol default port (80 / 443)
-    port: defaultPort == opts.port ? null : opts.port
+    port: defaultAgent.defaultPort == opts.port ? null : opts.port
   }));
 
   debug('url: %o', url);
@@ -97,13 +89,7 @@ function connect (req, opts, fn) {
 
     if ('DIRECT' == type) {
       // direct connection to the destination endpoint
-      var socket;
-      if (secure) {
-        socket = tls.connect(opts);
-      } else {
-        socket = net.connect(opts);
-      }
-      return fn(null, socket);
+      agent = defaultAgent;
     } else if ('SOCKS' == type) {
       // use a SOCKS proxy
       agent = new SocksProxyAgent('socks://' + parts[1]);
@@ -112,21 +98,15 @@ function connect (req, opts, fn) {
       // http://dev.chromium.org/developers/design-documents/secure-web-proxy
       var proxyURL = ('HTTPS' === type ? 'https' : 'http') + '://' + parts[1];
       var proxy = parse(proxyURL);
-      if (secure) {
+      if (defaultAgent.protocol === 'https:') {
         agent = new HttpsProxyAgent(proxy);
       } else {
         agent = new HttpProxyAgent(proxy);
       }
     } else {
       // direct connection to the destination endpoint
-      var socket;
-      if (secure) {
-        socket = tls.connect(opts);
-      } else {
-        socket = net.connect(opts);
-      }
-      return fn(null, socket);
+      agent = defaultAgent;
     }
-    if (agent) agent.callback(req, opts, fn);
+    agent.addRequest(req, opts);
   }
 }
