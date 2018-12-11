@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es2017",
+		"strict": true,
+		"resolveJsonModule": true,
+		"lib": [
+			"esnext"
+		]
+	},
+	"exclude": [
+		"node_modules"
+	]
+}
