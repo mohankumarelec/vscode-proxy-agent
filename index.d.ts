@@ -5,13 +5,10 @@
 
 import { Agent } from 'http';
 
-declare module 'vscode-proxy-agent' {
+export declare interface ProxyAgentOptions {
+	resolveProxy(url: string, callback: (proxy: string) => void): void;
+}
 
-	export interface ProxyAgentOptions {
-		resolveProxy(url: string, callback: (proxy: string) => void): void;
-	}
-	
-	export class ProxyAgent extends Agent {
-		constructor(options: ProxyAgentOptions)
-	}
+export declare class ProxyAgent extends Agent {
+	constructor(options: ProxyAgentOptions)
 }
