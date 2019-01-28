@@ -1,4 +1,5 @@
 import * as https from 'https';
+import { ClientRequest, RequestOptions } from 'http';
 import * as vpa from '../../..';
 import { testRequest, ca } from './utils';
 
@@ -8,7 +9,7 @@ describe('Proxied client', function () {
 			hostname: 'test-https-server',
 			path: '/test-path',
 			agent: new vpa.ProxyAgent({
-				resolveProxy: (url: string, cb: (res: string) => void) => cb('PROXY test-http-proxy:3128')
+				resolveProxy: (req: ClientRequest, opts: RequestOptions, url: string, cb: (res: string) => void) => cb('PROXY test-http-proxy:3128')
 			}),
 			ca,
 		});

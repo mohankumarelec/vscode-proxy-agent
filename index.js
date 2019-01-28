@@ -21,7 +21,7 @@ var debug = require('debug')('vscode-proxy-agent');
  * The `ProxyAgent` class.
  *
  * options : {
- *   resolveProxy(url, callback)
+ *   resolveProxy(req, opts, url, callback)
  * }
  * 
  * See https://github.com/atom/electron/blob/master/docs/api/session.md#sesresolveproxyurl-callback
@@ -69,7 +69,7 @@ function addRequest (req, opts) {
   }));
 
   debug('url: %o', url);
-  self.session.resolveProxy(url, onproxy);
+  self.session.resolveProxy(req, opts, url, onproxy);
 
   // `resolveProxy()` callback function
   function onproxy (proxy) {

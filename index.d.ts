@@ -3,10 +3,10 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Agent } from 'http';
+import { Agent, ClientRequest, RequestOptions } from 'http';
 
 export declare interface ProxyAgentOptions {
-	resolveProxy(url: string, callback: (proxy: string) => void): void;
+	resolveProxy(req: ClientRequest, opts: RequestOptions, url: string, callback: (proxy: string) => void): void;
 }
 
 export declare class ProxyAgent extends Agent {
