@@ -21,8 +21,6 @@ services:
             - ..:/repo
         networks:
             - test-proxies
-        ports:
-            - 8000:8000
         working_dir: /repo/tests/test-client
         environment:
             - MOCHA_TESTS=src/proxy.test.ts
