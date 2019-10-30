@@ -1,6 +1,9 @@
 # Change Log
 Notable changes will be documented here.
 
+## [0.5.1]
+- Allow for newer patch versions of dependencies.
+
 ## [0.5.0]
 - Update to https-proxy-agent 2.2.3 (https://nodesecurity.io/advisories/1184)
 
