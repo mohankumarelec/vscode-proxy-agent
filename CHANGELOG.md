@@ -1,6 +1,9 @@
 # Change Log
 Notable changes will be documented here.
 
+## [0.5.0]
+- Update to https-proxy-agent 2.2.3 (https://nodesecurity.io/advisories/1184)
+
 ## [0.4.0]
 - Fall back to original agent when provided in options.
 - Add default port to options.
