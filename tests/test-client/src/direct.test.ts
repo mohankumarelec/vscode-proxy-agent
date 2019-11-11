@@ -61,4 +61,16 @@ describe('Direct client', function () {
 			}
 		});
 	});
+	it('should should handle `false` as the original agent', function () {
+		return testRequest(https, {
+			hostname: 'test-https-server',
+			path: '/test-path',
+			agent: new vpa.ProxyAgent({
+				resolveProxy: (req: ClientRequest, opts: RequestOptions, url: string, cb: (res: string) => void) => cb('DIRECT'),
+				defaultPort: 443,
+				originalAgent: false
+			}),
+			ca,
+		});
+	});
 });

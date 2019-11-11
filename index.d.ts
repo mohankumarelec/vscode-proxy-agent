@@ -6,9 +6,9 @@
 import { Agent, ClientRequest, RequestOptions } from 'http';
 
 export declare interface ProxyAgentOptions {
-	resolveProxy(req: ClientRequest, opts: RequestOptions, url: string, callback: (proxy: string) => void): void;
+	resolveProxy(req: ClientRequest, opts: RequestOptions, url: string, callback: (proxy: string | undefined) => void): void;
 	defaultPort: number;
-	originalAgent?: Agent;
+	originalAgent?: Agent | false;
 }
 
 export declare class ProxyAgent extends Agent {

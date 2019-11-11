@@ -90,7 +90,7 @@ function addRequest (req, opts) {
 
     if ('DIRECT' == type) {
       // direct connection to the destination endpoint
-      agent = self.session.originalAgent || defaultAgent;
+      agent = getDirectAgent(self.session.originalAgent, defaultAgent);
     } else if ('SOCKS' == type) {
       // use a SOCKS proxy
       agent = new SocksProxyAgent('socks://' + parts[1]);
@@ -106,8 +106,15 @@ function addRequest (req, opts) {
       }
     } else {
       // direct connection to the destination endpoint
-      agent = self.session.originalAgent || defaultAgent;
+      agent = getDirectAgent(self.session.originalAgent, defaultAgent);
     }
     agent.addRequest(req, opts);
   }
+}
+
+function getDirectAgent(originalAgent, defaultAgent) {
+  if (originalAgent === false) {
+    return new defaultAgent.constructor();
+  }
+  return originalAgent || defaultAgent;
 }

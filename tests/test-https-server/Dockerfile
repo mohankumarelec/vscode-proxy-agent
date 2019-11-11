@@ -6,6 +6,6 @@ RUN apt-get update \
 
 WORKDIR /etc/nginx
 
-CMD openssl req -nodes -x509 -newkey rsa:1024 -keyout ssl_key.pem -out ssl_cert.pem -days 365 -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=test-https-server" \
-    && openssl req -nodes -x509 -newkey rsa:1024 -keyout ssl_teapot_key.pem -out ssl_teapot_cert.pem -days 365 -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=test-teapot-server" \
+CMD openssl req -nodes -x509 -newkey rsa:2048 -keyout ssl_key.pem -out ssl_cert.pem -days 365 -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=test-https-server" \
+    && openssl req -nodes -x509 -newkey rsa:2048 -keyout ssl_teapot_key.pem -out ssl_teapot_cert.pem -days 365 -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=test-teapot-server" \
     && nginx -g 'daemon off;'

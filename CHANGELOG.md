@@ -1,6 +1,10 @@
 # Change Log
 Notable changes will be documented here.
 
+## [0.5.2]
+- Handle false as the original proxy.
+- Update typings.
+
 ## [0.5.1]
 - Allow for newer patch versions of dependencies.
 
