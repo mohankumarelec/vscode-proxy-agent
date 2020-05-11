@@ -34,6 +34,16 @@ services:
             - test-proxies-and-servers
         ports:
             - 3128
+    test-http-auth-proxy:
+        image: test-http-auth-proxy:latest
+        build: test-http-auth-proxy
+        links:
+            - test-https-server
+        networks:
+            - test-proxies
+            - test-proxies-and-servers
+        ports:
+            - 3128
     test-https-server:
         image: test-https-server:latest
         build: test-https-server
