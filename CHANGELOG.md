@@ -1,6 +1,9 @@
 # Change Log
 Notable changes will be documented here.
 
+## [0.6.0]
+- Use TypeScript.
+
 ## [0.5.2]
 - Handle false as the original proxy.
 - Update typings.
