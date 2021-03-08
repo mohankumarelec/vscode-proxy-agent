@@ -3,6 +3,7 @@ Notable changes will be documented here.
 
 ## [0.6.0]
 - Use TypeScript.
+- Move proxy resolution from VS Code here.
 
 ## [0.5.2]
 - Handle false as the original proxy.
