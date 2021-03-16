@@ -272,7 +272,7 @@ function noProxyFromEnv(envValue?: string) {
 	});
 }
 
-export function createHttpPatch(originals: typeof http | typeof https, resolveProxy: ReturnType<typeof createProxyResolver>, proxySetting: { config: string }, certSetting: { config: boolean }, onRequest: boolean) {
+export function createHttpPatch(originals: typeof http | typeof https, resolveProxy: ReturnType<typeof createProxyResolver>, proxySetting: { config: 'override' | 'on' | 'off' }, certSetting: { config: boolean }, onRequest: boolean) {
 	return {
 		get: patch(originals.get),
 		request: patch(originals.request)
@@ -299,7 +299,7 @@ export function createHttpPatch(originals: typeof http | typeof https, resolvePr
 			if (originalAgent === true) {
 				throw new Error('Unexpected agent option: true');
 			}
-      const isHttps = (originals.globalAgent as any).protocol === 'https:';
+			const isHttps = (originals.globalAgent as any).protocol === 'https:';
 			const optionsPatched = originalAgent instanceof ProxyAgent;
 			const config = onRequest && ((<any>options)._vscodeProxySupport || /* LS */ (<any>options)._vscodeSystemProxy) || proxySetting.config;
 			const useProxySettings = !optionsPatched && (config === 'override' || config === 'on' && originalAgent === undefined);
@@ -324,7 +324,7 @@ export function createHttpPatch(originals: typeof http | typeof https, resolvePr
 				options.agent = new ProxyAgent({
 					resolveProxy: resolveProxy.bind(undefined, { useProxySettings, useSystemCertificates }),
 					defaultPort: isHttps ? 443 : 80,
-					originalAgent
+					originalAgent: !useProxySettings ? originalAgent : undefined,
 				});
 				return original(options, callback);
 			}

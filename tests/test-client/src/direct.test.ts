@@ -35,11 +35,11 @@ describe('Direct client', function () {
 			ca,
 		}, {
 			assertResult: result => {
-				assert.equal(result.headers.host, 'test-https-server');
+				assert.strictEqual(result.headers.host, 'test-https-server');
 			}
 		});
 	});
-	it('should should fall back to original agent when not proxied', function () {
+	it('should fall back to original agent when not proxied', function () {
 		// https://github.com/Microsoft/vscode/issues/68531
 		return testRequest(https, {
 			hostname: 'test-https-server',
@@ -57,11 +57,11 @@ describe('Direct client', function () {
 			ca,
 		}, {
 			assertResult: result => {
-				assert.equal(result.headers['original-agent'], 'true');
+				assert.strictEqual(result.headers['original-agent'], 'true');
 			}
 		});
 	});
-	it('should should handle `false` as the original agent', function () {
+	it('should handle `false` as the original agent', function () {
 		return testRequest(https, {
 			hostname: 'test-https-server',
 			path: '/test-path',
@@ -72,5 +72,56 @@ describe('Direct client', function () {
 			}),
 			ca,
 		});
+	});
+
+	const directProxyAgentParams = {
+		resolveProxy: async () => 'DIRECT',
+		getHttpProxySetting: () => undefined,
+		log: (level: vpa.LogLevel, message: string, ...args: any[]) => level >= vpa.LogLevel.Debug && console.log(message, ...args),
+		getLogLevel: () => vpa.LogLevel.Debug,
+		proxyResolveTelemetry: () => undefined,
+		useHostProxy: true,
+		env: {},
+	};
+	it('should override original agent', async function () {
+		// https://github.com/microsoft/vscode/issues/117054
+		const resolveProxy = vpa.createProxyResolver(directProxyAgentParams);
+		const patchedHttps: typeof https = {
+			...https,
+			...vpa.createHttpPatch(https, resolveProxy, { config: 'override' }, { config: false }, false),
+		} as any;
+		let seen = false;
+		await testRequest(patchedHttps, {
+			hostname: 'test-https-server',
+			path: '/test-path',
+			agent: {
+				addRequest: (req: any, opts: any) => {
+					seen = true;
+					(<any>https.globalAgent).addRequest(req, opts);
+				}
+			} as any,
+			ca,
+		});
+		assert.ok(!seen, 'Original agent called!');
+	});
+	it('should use original agent', async function () {
+		const resolveProxy = vpa.createProxyResolver(directProxyAgentParams);
+		const patchedHttps: typeof https = {
+			...https,
+			...vpa.createHttpPatch(https, resolveProxy, { config: 'on' }, { config: false }, false),
+		} as any;
+		let seen = false;
+		await testRequest(patchedHttps, {
+			hostname: 'test-https-server',
+			path: '/test-path',
+			agent: {
+				addRequest: (req: any, opts: any) => {
+					seen = true;
+					(<any>https.globalAgent).addRequest(req, opts);
+				}
+			} as any,
+			ca,
+		});
+		assert.ok(seen, 'Original agent not called!');
 	});
 });
