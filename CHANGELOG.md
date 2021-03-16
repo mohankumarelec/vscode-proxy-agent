@@ -1,6 +1,9 @@
 # Change Log
 Notable changes will be documented here.
 
+## [0.7.0]
+- Override original agent (fixes [microsoft/vscode#117054](https://github.com/microsoft/vscode/issues/117054))
+
 ## [0.6.0]
 - Use TypeScript.
 - Move proxy resolution from VS Code here.
