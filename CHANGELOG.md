@@ -1,6 +1,9 @@
 # Change Log
 Notable changes will be documented here.
 
+## [0.9.0]
+- Copy and adapt pac-proxy-agent to catch up with latest dependencies and bug fixes.
+
 ## [0.8.0]
 - Align log level constants with VS Code.
 
