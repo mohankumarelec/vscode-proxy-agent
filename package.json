@@ -34,13 +34,10 @@
     "get-uri": "3",
     "http-proxy-agent": "^4.0.1",
     "https-proxy-agent": "5",
-    "pac-resolver": "^4.1.0",
-    "raw-body": "^2.2.0",
     "socks-proxy-agent": "5"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
-    "@types/http-proxy-agent": "^2.0.2",
     "@types/node": "^12.18.3",
     "typescript": "^4.2.2"
   },

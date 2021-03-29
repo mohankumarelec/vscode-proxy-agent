@@ -1,6 +1,5 @@
 import * as https from 'https';
-import { ClientRequest, RequestOptions } from 'http';
-import * as vpa from '../../..';
+import createPacProxyAgent from '../../../src/agent';
 import { testRequest, ca } from './utils';
 
 describe('Proxied client', function () {
@@ -8,10 +7,7 @@ describe('Proxied client', function () {
 		return testRequest(https, {
 			hostname: 'test-https-server',
 			path: '/test-path',
-			agent: new vpa.ProxyAgent({
-				resolveProxy: (req: ClientRequest, opts: RequestOptions, url: string, cb: (res: string) => void) => cb('PROXY test-http-proxy:3128'),
-				defaultPort: 443
-			}),
+			agent: createPacProxyAgent(async () => 'PROXY test-http-proxy:3128'),
 			ca,
 		});
 	});

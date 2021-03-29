@@ -1,6 +1,6 @@
 import * as https from 'https';
-import { ClientRequest, RequestOptions } from 'http';
 import * as vpa from '../../..';
+import createPacProxyAgent from '../../../src/agent';
 import { testRequest, ca } from './utils';
 import * as assert from 'assert';
 
@@ -16,10 +16,7 @@ describe('Direct client', function () {
 		return testRequest(https, {
 			hostname: 'test-https-server',
 			path: '/test-path',
-			agent: new vpa.ProxyAgent({
-				resolveProxy: (req: ClientRequest, opts: RequestOptions, url: string, cb: (res: string) => void) => cb('DIRECT'),
-				defaultPort: 443
-			}),
+			agent: createPacProxyAgent(async () => 'DIRECT'),
 			ca,
 		});
 	});
@@ -28,10 +25,7 @@ describe('Direct client', function () {
 		return testRequest(https, {
 			hostname: 'test-https-server',
 			path: '/test-path',
-			agent: new vpa.ProxyAgent({
-				resolveProxy: (req: ClientRequest, opts: RequestOptions, url: string, cb: (res: string) => void) => cb('DIRECT'),
-				defaultPort: 443
-			}),
+			agent: createPacProxyAgent(async () => 'DIRECT'),
 			ca,
 		}, {
 			assertResult: result => {
@@ -41,23 +35,22 @@ describe('Direct client', function () {
 	});
 	it('should fall back to original agent when not proxied', function () {
 		// https://github.com/Microsoft/vscode/issues/68531
+		let originalAgent = false;
 		return testRequest(https, {
 			hostname: 'test-https-server',
 			path: '/test-path',
-			agent: new vpa.ProxyAgent({
-				resolveProxy: (req: ClientRequest, opts: RequestOptions, url: string, cb: (res: string) => void) => cb('DIRECT'),
-				defaultPort: 443,
+			agent: createPacProxyAgent(async () => 'DIRECT', {
 				originalAgent: {
 					addRequest: (req: any, opts: any) => {
-						req.setHeader('original-agent', 'true');
+						originalAgent = true;
 						(<any>https.globalAgent).addRequest(req, opts);
 					}
 				} as any
 			}),
 			ca,
 		}, {
-			assertResult: result => {
-				assert.strictEqual(result.headers['original-agent'], 'true');
+			assertResult: () => {
+				assert.ok(originalAgent);
 			}
 		});
 	});
@@ -65,11 +58,7 @@ describe('Direct client', function () {
 		return testRequest(https, {
 			hostname: 'test-https-server',
 			path: '/test-path',
-			agent: new vpa.ProxyAgent({
-				resolveProxy: (req: ClientRequest, opts: RequestOptions, url: string, cb: (res: string) => void) => cb('DIRECT'),
-				defaultPort: 443,
-				originalAgent: false
-			}),
+			agent: createPacProxyAgent(async () => 'DIRECT', { originalAgent: false }),
 			ca,
 		});
 	});
@@ -115,6 +104,7 @@ describe('Direct client', function () {
 			hostname: 'test-https-server',
 			path: '/test-path',
 			agent: {
+				defaultPort: 443, // This is required to support request options without port/defaultPort.
 				addRequest: (req: any, opts: any) => {
 					seen = true;
 					(<any>https.globalAgent).addRequest(req, opts);
