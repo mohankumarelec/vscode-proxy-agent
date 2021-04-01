@@ -1,8 +1,14 @@
 # Change Log
 Notable changes will be documented here.
 
+## [vnext]
+- Do not override original agent (forward port [microsoft/vscode#120354](https://github.com/microsoft/vscode/issues/120354))
+
 ## [0.9.0]
 - Copy and adapt pac-proxy-agent to catch up with latest dependencies and bug fixes.
+
+## [0.8.2]
+- Do not override original agent (fixes [microsoft/vscode#120354](https://github.com/microsoft/vscode/issues/120354))
 
 ## [0.8.0]
 - Align log level constants with VS Code.

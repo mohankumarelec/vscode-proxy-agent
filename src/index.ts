@@ -323,7 +323,7 @@ export function createHttpPatch(originals: typeof http | typeof https, resolvePr
 					options = { ...options };
 				}
 				const resolveP = (req: http.ClientRequest, opts: http.RequestOptions, url: string): Promise<string | undefined> => new Promise<string | undefined>(resolve => resolveProxy({ useProxySettings, useSystemCertificates }, req, opts, url, resolve));
-				options.agent = createPacProxyAgent(resolveP, { originalAgent: !useProxySettings ? originalAgent : undefined })
+				options.agent = createPacProxyAgent(resolveP, { originalAgent })
 				return original(options, callback);
 			}
 
