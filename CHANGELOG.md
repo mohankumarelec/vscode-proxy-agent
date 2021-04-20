@@ -1,6 +1,9 @@
 # Change Log
 Notable changes will be documented here.
 
+## [0.11.0]
+- Override original agent again (fixes [microsoft/vscode#117054](https://github.com/microsoft/vscode/issues/117054))
+
 ## [0.10.0]
 - Do not override original agent (forward port [microsoft/vscode#120354](https://github.com/microsoft/vscode/issues/120354))
 - Move vscode-windows-ca-certs dependency ([microsoft/vscode#120546](https://github.com/microsoft/vscode/issues/120546))

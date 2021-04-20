@@ -72,12 +72,56 @@ describe('Direct client', function () {
 		useHostProxy: true,
 		env: {},
 	};
-	it('should use original agent', async function () {
-		// https://github.com/microsoft/vscode/issues/120354 (superseding https://github.com/microsoft/vscode/issues/117054)
+	it('should override original agent', async function () {
+		// https://github.com/microsoft/vscode/issues/117054
 		const resolveProxy = vpa.createProxyResolver(directProxyAgentParams);
 		const patchedHttps: typeof https = {
 			...https,
 			...vpa.createHttpPatch(https, resolveProxy, { config: 'override' }, { config: false }, false),
+		} as any;
+		let seen = false;
+		await testRequest(patchedHttps, {
+			hostname: 'test-https-server',
+			path: '/test-path',
+			agent: {
+				defaultPort: 443, // This is required to support request options without port/defaultPort.
+				addRequest: (req: any, opts: any) => {
+					seen = true;
+					(<any>https.globalAgent).addRequest(req, opts);
+				}
+			} as any,
+			ca,
+		});
+		assert.ok(!seen, 'Original agent called!');
+	});
+	it('should use original agent', async function () {
+		// https://github.com/microsoft/vscode/issues/117054 avoiding https://github.com/microsoft/vscode/issues/120354
+		const resolveProxy = vpa.createProxyResolver(directProxyAgentParams);
+		const patchedHttps: typeof https = {
+			...https,
+			...vpa.createHttpPatch(https, resolveProxy, { config: 'override' }, { config: false }, false),
+		} as any;
+		let seen = false;
+		await testRequest(patchedHttps, {
+			hostname: '',
+			path: '/test-path',
+			agent: {
+				defaultPort: 443, // This is required to support request options without port/defaultPort.
+				addRequest: (req: any, opts: any) => {
+					seen = true;
+					(<any>https.globalAgent).addRequest(req, opts);
+				}
+			} as any,
+			ca,
+		}).catch(() => {}); // Connection failure expected.
+		assert.ok(seen, 'Original agent not called!');
+	});
+	it('should use original agent', async function () {
+		// https://github.com/microsoft/vscode/issues/117054
+		const resolveProxy = vpa.createProxyResolver(directProxyAgentParams);
+		const patchedHttps: typeof https = {
+			...https,
+			...vpa.createHttpPatch(https, resolveProxy, { config: 'fallback' }, { config: false }, false),
 		} as any;
 		let seen = false;
 		await testRequest(patchedHttps, {

@@ -273,7 +273,9 @@ function noProxyFromEnv(envValue?: string) {
 	});
 }
 
-export function createHttpPatch(originals: typeof http | typeof https, resolveProxy: ReturnType<typeof createProxyResolver>, proxySetting: { config: 'override' | 'on' | 'off' }, certSetting: { config: boolean }, onRequest: boolean) {
+export type ProxySupportSetting = 'override' | 'fallback' | 'on' | 'off';
+
+export function createHttpPatch(originals: typeof http | typeof https, resolveProxy: ReturnType<typeof createProxyResolver>, proxySetting: { config: ProxySupportSetting }, certSetting: { config: boolean }, onRequest: boolean) {
 	return {
 		get: patch(originals.get),
 		request: patch(originals.request)
@@ -302,8 +304,8 @@ export function createHttpPatch(originals: typeof http | typeof https, resolvePr
 			}
 			const isHttps = (originals.globalAgent as any).protocol === 'https:';
 			const optionsPatched = originalAgent instanceof PacProxyAgent;
-			const config = onRequest && ((<any>options)._vscodeProxySupport || /* LS */ (<any>options)._vscodeSystemProxy) || proxySetting.config;
-			const useProxySettings = !optionsPatched && (config === 'override' || config === 'on' && originalAgent === undefined);
+			const config: ProxySupportSetting = onRequest && ((<any>options)._vscodeProxySupport || /* LS */ (<any>options)._vscodeSystemProxy) || proxySetting.config;
+			const useProxySettings = !optionsPatched && (config === 'override' || config === 'fallback' || (config === 'on' && originalAgent === undefined));
 			const useSystemCertificates = !optionsPatched && certSetting.config && isHttps && !(options as https.RequestOptions).ca;
 
 			if (useProxySettings || useSystemCertificates) {
@@ -323,7 +325,9 @@ export function createHttpPatch(originals: typeof http | typeof https, resolvePr
 					options = { ...options };
 				}
 				const resolveP = (req: http.ClientRequest, opts: http.RequestOptions, url: string): Promise<string | undefined> => new Promise<string | undefined>(resolve => resolveProxy({ useProxySettings, useSystemCertificates }, req, opts, url, resolve));
-				options.agent = createPacProxyAgent(resolveP, { originalAgent })
+				const host = options.hostname || options.host;
+				const isLocalhost = !host || host === 'localhost' || host === '127.0.0.1'; // Avoiding https://github.com/microsoft/vscode/issues/120354
+				options.agent = createPacProxyAgent(resolveP, { originalAgent: (!useProxySettings || isLocalhost || config === 'fallback') ? originalAgent : undefined })
 				return original(options, callback);
 			}
 
