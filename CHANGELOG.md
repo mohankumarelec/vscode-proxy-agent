@@ -1,7 +1,7 @@
 # Change Log
 Notable changes will be documented here.
 
-## [vnext]
+## [0.10.0]
 - Do not override original agent (forward port [microsoft/vscode#120354](https://github.com/microsoft/vscode/issues/120354))
 - Move vscode-windows-ca-certs dependency ([microsoft/vscode#120546](https://github.com/microsoft/vscode/issues/120546))
 
