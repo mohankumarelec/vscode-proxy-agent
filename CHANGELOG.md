@@ -3,6 +3,7 @@ Notable changes will be documented here.
 
 ## [vnext]
 - Do not override original agent (forward port [microsoft/vscode#120354](https://github.com/microsoft/vscode/issues/120354))
+- Move vscode-windows-ca-certs dependency ([microsoft/vscode#120546](https://github.com/microsoft/vscode/issues/120546))
 
 ## [0.9.0]
 - Copy and adapt pac-proxy-agent to catch up with latest dependencies and bug fixes.
