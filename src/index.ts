@@ -193,8 +193,9 @@ export function createProxyResolver(params: ProxyAgentParams) {
 				duration = Date.now() - start + duration;
 			}, err => {
 				errorCount++;
-				callback();
-				log(LogLevel.Error, 'ProxyResolver#resolveProxy', toErrorMessage(err), stackText);
+				const fallback: string | undefined = cache.values().next().value; // fall back to any proxy (https://github.com/microsoft/vscode/issues/122825)
+				callback(fallback);
+				log(LogLevel.Error, 'ProxyResolver#resolveProxy', fallback, toErrorMessage(err), stackText);
 			});
 	}
 
