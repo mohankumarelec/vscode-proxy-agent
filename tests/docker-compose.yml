@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
     test-direct-client:
-        image: node:12
+        image: node:14
         links:
             - test-https-server
         volumes:
@@ -11,10 +11,10 @@ services:
             - test-servers
         working_dir: /repo/tests/test-client
         environment:
-            - MOCHA_TESTS=src/direct.test.ts
+            - MOCHA_TESTS=src/direct.test.ts src/tls.test.ts
         command: npm run test:watch
     test-proxy-client:
-        image: node:12
+        image: node:14
         links:
             - test-http-proxy
         volumes:

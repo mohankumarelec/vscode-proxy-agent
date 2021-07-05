@@ -283,7 +283,7 @@ export function createHttpPatch(originals: typeof http | typeof https, resolvePr
 	};
 
 	function patch(original: typeof http.get) {
-		function patched(url?: string | URL | null, options?: http.RequestOptions | null, callback?: (res: http.IncomingMessage) => void): http.ClientRequest {
+		function patched(url?: string | nodeurl.URL | null, options?: http.RequestOptions | null, callback?: (res: http.IncomingMessage) => void): http.ClientRequest {
 			if (typeof url !== 'string' && !(url && (<any>url).searchParams)) {
 				callback = <any>options;
 				options = url;
@@ -338,23 +338,27 @@ export function createHttpPatch(originals: typeof http | typeof https, resolvePr
 	}
 }
 
+export interface SecureContextOptionsPatch {
+	_vscodeAdditionalCaCerts?: string[];
+}
+
 export function createTlsPatch(originals: typeof tls) {
 	return {
-		createSecureContext: patch(originals.createSecureContext)
+		createSecureContext: patchCreateSecureContext(originals.createSecureContext),
 	};
+}
 
-	function patch(original: typeof tls.createSecureContext): typeof tls.createSecureContext {
-		return function (details?: tls.SecureContextOptions): ReturnType<typeof tls.createSecureContext> {
-			const context = original.apply(null, arguments as any);
-			const certs = (details as any)._vscodeAdditionalCaCerts;
-			if (certs) {
-				for (const cert of certs) {
-					context.context.addCACert(cert);
-				}
+function patchCreateSecureContext(original: typeof tls.createSecureContext): typeof tls.createSecureContext {
+	return function (details?: tls.SecureContextOptions): ReturnType<typeof tls.createSecureContext> {
+		const context = original.apply(null, arguments as any);
+		const certs = (details as SecureContextOptionsPatch)._vscodeAdditionalCaCerts;
+		if (certs) {
+			for (const cert of certs) {
+				context.context.addCACert(cert);
 			}
-			return context;
-		};
-	}
+		}
+		return context;
+	};
 }
 
 function useSystemCertificates(params: ProxyAgentParams, useSystemCertificates: boolean, opts: http.RequestOptions, callback: () => void) {
@@ -363,7 +367,7 @@ function useSystemCertificates(params: ProxyAgentParams, useSystemCertificates: 
 			.then(caCertificates => {
 				if (caCertificates) {
 					if (caCertificates.append) {
-						(opts as any)._vscodeAdditionalCaCerts = caCertificates.certs;
+						(opts as SecureContextOptionsPatch)._vscodeAdditionalCaCerts = caCertificates.certs;
 					} else {
 						(opts as https.RequestOptions).ca = caCertificates.certs;
 					}
