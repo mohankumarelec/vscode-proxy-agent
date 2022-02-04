@@ -1,6 +1,9 @@
 # Change Log
 Notable changes will be documented here.
 
+## [0.12.0]
+- Avoid buffer deprecation warning (fixes [microsoft/vscode#136874](https://github.com/microsoft/vscode/issues/136874))
+
 ## [0.11.0]
 - Override original agent again (fixes [microsoft/vscode#117054](https://github.com/microsoft/vscode/issues/117054))
 
