@@ -2,7 +2,6 @@ import http from 'http';
 import https from 'https';
 import net from 'net';
 import once from '@tootallnate/once';
-import getUri from 'get-uri';
 import createDebug from 'debug';
 import { Readable } from 'stream';
 import { format, parse } from 'url';
@@ -197,11 +196,6 @@ namespace createPacProxyAgent {
 
 	export type PacProxyAgent = _PacProxyAgent;
 	export const PacProxyAgent = _PacProxyAgent;
-
-	/**
-	 * Supported "protocols". Delegates out to the `get-uri` module.
-	 */
-	export const protocols = Object.keys(getUri.protocols);
 
 	createPacProxyAgent.prototype = _PacProxyAgent.prototype;
 }

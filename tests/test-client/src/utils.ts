@@ -28,7 +28,7 @@ export async function testRequest<C extends typeof https | typeof http>(client: 
 						testOptions.assertResult(result);
 					}
 					resolve();
-				} catch (err) {
+				} catch (err: any) {
 					err.message = `${err.message}: ${data}`;
 					reject(err);
 				}

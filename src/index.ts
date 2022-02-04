@@ -465,8 +465,8 @@ async function readLinuxCaCertificates() {
 				certs: Array.from(certs),
 				append: false
 			};
-		} catch (err) {
-			if (err.code !== 'ENOENT') {
+		} catch (err: any) {
+			if (err?.code !== 'ENOENT') {
 				throw err;
 			}
 		}

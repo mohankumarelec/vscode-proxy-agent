@@ -31,7 +31,6 @@
     "@tootallnate/once": "^1.1.2",
     "agent-base": "^6.0.2",
     "debug": "^4.3.1",
-    "get-uri": "^3.0.2",
     "http-proxy-agent": "^4.0.1",
     "https-proxy-agent": "^5.0.0",
     "socks-proxy-agent": "^5.0.0"
