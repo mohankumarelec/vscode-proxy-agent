@@ -5,3 +5,4 @@ tests
 tsconfig.json
 src
 *.tgz
+azure-pipelines
