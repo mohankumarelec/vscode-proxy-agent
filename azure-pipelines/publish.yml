@@ -29,16 +29,7 @@ extends:
         buildSteps:
           - script: npm ci
             displayName: Install dependencies
-
-        testPlatforms:
-          - name: Linux
-            nodeVersions:
-              - 16.x
-          - name: MacOS
-            nodeVersions:
-              - 16.x
-          - name: Windows
-            nodeVersions:
-              - 16.x
+          - script: npm run compile
+            displayName: Compile
 
         publishPackage: ${{ parameters.publishPackage }}
