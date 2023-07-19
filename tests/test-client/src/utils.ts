@@ -13,12 +13,14 @@ export const ca = [
 
 export const directProxyAgentParams: vpa.ProxyAgentParams = {
 	resolveProxy: async () => 'DIRECT',
-	getHttpProxySetting: () => undefined,
+    getProxyURL: () => undefined,
+    getProxySupport: () => 'override',
+    getSystemCertificatesV1: () => false,
+    getSystemCertificatesV2: () => true,
 	log: (_level: vpa.LogLevel, message: string, ...args: any[]) => console.log(message, ...args),
 	getLogLevel: () => vpa.LogLevel.Debug,
 	proxyResolveTelemetry: () => undefined,
 	useHostProxy: true,
-	useSystemCertificatesV2: true,
 	addCertificates: ca,
 	env: {},
 };
@@ -30,7 +32,10 @@ export async function testRequest<C extends typeof https | typeof http>(client: 
 				const chunks: Buffer[] = [];
 				res.on('data', chunk => chunks.push(chunk));
 				res.on('end', () => {
-					reject(new Error(`Error status: ${res.statusCode} ${res.statusMessage} \n${Buffer.concat(chunks).toString()}`));
+					const err = new Error(`Error status: ${res.statusCode} ${res.statusMessage} \n${Buffer.concat(chunks).toString()}`);
+					(err as any).statusCode = res.statusCode;
+					(err as any).statusMessage = res.statusMessage;
+					reject(err);
 				});
 				return;
 			}
