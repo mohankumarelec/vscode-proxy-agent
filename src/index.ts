@@ -160,20 +160,24 @@ export function createProxyResolver(params: ProxyAgentParams) {
 
 		const { secureEndpoint } = opts as any;
 		const defaultPort = secureEndpoint ? 443 : 80;
-		if (typeof hostname === 'string' && envNoProxy(hostname, String(parsedUrl.port || defaultPort))) {
-			envNoProxyCount++;
-			callback('DIRECT');
-			log.debug('ProxyResolver#resolveProxy envNoProxy', url, 'DIRECT', stackText);
-			return;
+
+		// if there are any config entries present then env variables are ignored
+		if (params.getNoProxyConfig && params.getNoProxyConfig().length) {
+			if (typeof hostname === 'string' && configNoProxy(hostname, String(parsedUrl.port || defaultPort))) {
+				configNoProxyCount++;
+				callback('DIRECT');
+				log.debug('ProxyResolver#resolveProxy configNoProxy', url, 'DIRECT', stackText);
+				return;
+			}
+		} else {
+			if (typeof hostname === 'string' && envNoProxy(hostname, String(parsedUrl.port || defaultPort))) {
+				envNoProxyCount++;
+				callback('DIRECT');
+				log.debug('ProxyResolver#resolveProxy envNoProxy', url, 'DIRECT', stackText);
+				return;
+			}	
 		}
 
-		if (typeof hostname === 'string' && configNoProxy(hostname, String(parsedUrl.port || defaultPort))) {
-			configNoProxyCount++;
-			callback('DIRECT');
-			log.debug('ProxyResolver#resolveProxy configNoProxy', url, 'DIRECT', stackText);
-			return;
-		}
-		
 		let settingsProxy = proxyFromConfigURL(getProxyURL());
 		if (settingsProxy) {
 			settingsCount++;
@@ -276,17 +280,11 @@ function proxyFromConfigURL(configURL: string | undefined) {
 	return undefined;
 }
 
-function noProxyFromEnv(envValue?: string) {
-	const value = (envValue || '')
-		.trim()
-		.toLowerCase();
-
-	if (value === '*') {
+function shouldBypassProxy(value: string[]) {
+	if (value.includes("*")) {
 		return () => true;
 	}
-
 	const filters = value
-		.split(',')
 		.map(s => s.trim().split(':', 2))
 		.map(([name, port]) => ({ name, port }))
 		.filter(filter => !!filter.name)
@@ -302,27 +300,18 @@ function noProxyFromEnv(envValue?: string) {
 	});
 }
 
+function noProxyFromEnv(envValue?: string) {
+	const value = (envValue || '')
+		.trim()
+		.toLowerCase()
+		.split(',');
+	return shouldBypassProxy(value);
+}
+
 function noProxyFromConfig(noProxy: string[]) {
-	const value = noProxy.map((item) => item.trim().toLowerCase());
-
-	if (value.includes("*")) {
-		return () => true;
-	}
-
-	const filters = value
-		.map(s => s.trim().split(':', 2))
-		.map(([name, port]) => ({ name, port }))
-		.filter(filter => !!filter.name)
-		.map(({ name, port }) => {
-			const domain = name[0] === '.' ? name : `.${name}`;
-			return { domain, port };
-		});
-	if (!filters.length) {
-		return () => false;
-	}
-	return (hostname: string, port: string) => filters.some(({ domain, port: filterPort }) => {
-		return `.${hostname.toLowerCase()}`.endsWith(domain) && (!filterPort || port === filterPort);
-	});
+	const value = noProxy
+		.map((item) => item.trim().toLowerCase());
+	return shouldBypassProxy(value);
 }
 
 export type ProxySupportSetting = 'override' | 'fallback' | 'on' | 'off';
