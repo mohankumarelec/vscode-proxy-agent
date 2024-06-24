@@ -80,8 +80,6 @@ export function createProxyResolver(params: ProxyAgentParams) {
 	let envProxy = proxyFromConfigURL(env.https_proxy || env.HTTPS_PROXY || env.http_proxy || env.HTTP_PROXY); // Not standardized.
 
 	let envNoProxy = noProxyFromEnv(env.no_proxy || env.NO_PROXY); // Not standardized.
-	let noProxyConfig = params.getNoProxyConfig ? params.getNoProxyConfig() : [];
-	let configNoProxy = noProxyFromConfig(noProxyConfig); // Not standardized.
 
 	let cacheRolls = 0;
 	let oldCache = new Map<string, string>();
@@ -163,7 +161,9 @@ export function createProxyResolver(params: ProxyAgentParams) {
 		const defaultPort = secureEndpoint ? 443 : 80;
 
 		// if there are any config entries present then env variables are ignored
+		let noProxyConfig = params.getNoProxyConfig ? params.getNoProxyConfig() : [];
 		if (noProxyConfig.length) {
+			let configNoProxy = noProxyFromConfig(noProxyConfig); // Not standardized.
 			if (typeof hostname === 'string' && configNoProxy(hostname, String(parsedUrl.port || defaultPort))) {
 				configNoProxyCount++;
 				callback('DIRECT');
