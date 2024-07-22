@@ -283,7 +283,7 @@ function noProxyFromEnv(envValue?: string) {
 			const domain = name[0] === '.' ? name : `.${name}`;
 			return { domain, port };
 		});
-	if (!filters.length) {
+	if (filters.length === 0) {
 		return () => false;
 	}
 	return (hostname: string, port: string) => filters.some(({ domain, port: filterPort }) => {
